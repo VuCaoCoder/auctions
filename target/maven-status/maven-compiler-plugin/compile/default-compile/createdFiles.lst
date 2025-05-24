@@ -1,0 +1,9 @@
+com\example\auctions\model\User.class
+com\example\auctions\config\PasswordConfig.class
+com\example\auctions\model\TransactionStatus.class
+com\example\auctions\repository\UserRepository.class
+com\example\auctions\model\Transaction.class
+com\example\auctions\model\AuctionStatus.class
+com\example\auctions\model\UserRole.class
+com\example\auctions\controller\AuctionController.class
+com\example\auctions\model\Auction.class

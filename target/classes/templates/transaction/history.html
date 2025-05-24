@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::main})}">
+  <head>
+    <title>Transaction History - Auctions</title>
+  </head>
+  <body>
+    <main>
+      <style>
+        .transaction-header {
+          background: linear-gradient(135deg, #0d6efd20 0%, #0d6efd05 100%);
+          border-radius: 20px;
+          padding: 2rem;
+          margin-bottom: 2rem;
+        }
+
+        .transaction-section {
+          background: white;
+          border-radius: 15px;
+          border: 1px solid rgba(0, 0, 0, 0.1);
+          overflow: hidden;
+          margin-bottom: 2rem;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .transaction-card {
+          background: white;
+          border: 1px solid #e9ecef;
+          border-radius: 10px;
+          margin-bottom: 1rem;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .transaction-card:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .transaction-header {
+          padding: 1rem;
+          border-bottom: 1px solid #e9ecef;
+          background: #f8f9fa;
+        }
+
+        .transaction-body {
+          padding: 1rem;
+        }
+
+        .transaction-footer {
+          padding: 1rem;
+          background: #f8f9fa;
+          border-top: 1px solid #e9ecef;
+        }
+
+        .amount {
+          font-size: 1.25rem;
+          font-weight: 700;
+          color: #0d6efd;
+        }
+
+        .status-badge {
+          padding: 0.5rem 1rem;
+          border-radius: 20px;
+          font-weight: 600;
+          font-size: 0.875rem;
+        }
+
+        .status-completed {
+          background: #d1e7dd;
+          color: #0f5132;
+        }
+
+        .empty-state {
+          text-align: center;
+          padding: 3rem;
+          background: white;
+          border-radius: 15px;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .empty-state i {
+          font-size: 4rem;
+          color: #6c757d;
+          margin-bottom: 1rem;
+        }
+
+        .nav-tabs {
+          border: none;
+          margin-bottom: 2rem;
+        }
+
+        .nav-tabs .nav-link {
+          border: none;
+          color: #6c757d;
+          padding: 1rem 2rem;
+          border-radius: 10px;
+          margin-right: 1rem;
+          font-weight: 500;
+          transition: all 0.3s ease;
+        }
+
+        .nav-tabs .nav-link:hover {
+          color: #0d6efd;
+          background: #f8f9fa;
+        }
+
+        .nav-tabs .nav-link.active {
+          color: #0d6efd;
+          background: #e7f1ff;
+          border: none;
+        }
+      </style>
+
+      <div class="transaction-header">
+        <div class="container">
+          <h1 class="mb-4">Transaction History</h1>
+
+          <!-- Seller View -->
+          <div sec:authorize="hasRole('SELLER')">
+            <div th:if="${#lists.isEmpty(soldAuctions)}" class="empty-state">
+              <i class="bi bi-shop"></i>
+              <h3>No Sales Yet</h3>
+              <p class="text-muted">You haven't sold any items yet.</p>
+              <a href="/auctions/create" class="btn btn-primary mt-3">
+                <i class="bi bi-plus-circle me-2"></i>Create New Auction
+              </a>
+            </div>
+
+            <div th:if="${not #lists.isEmpty(soldAuctions)}" class="transaction-section">
+              <div th:each="auction : ${soldAuctions}" class="transaction-card">
+                <div class="transaction-header d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0" th:text="${auction.productName}">Product Name</h5>
+                  <span class="status-badge status-completed">Sold</span>
+                </div>
+                <div class="transaction-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <p class="mb-2">
+                        <strong>Winner:</strong>
+                        <span th:text="${auction.winner.fullName}">Winner Name</span>
+                      </p>
+                      <p class="mb-2">
+                        <strong>End Date:</strong>
+                        <span th:text="${#temporals.format(auction.endTime, 'dd MMM yyyy HH:mm')}">End Date</span>
+                      </p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                      <p class="mb-2">Final Price:</p>
+                      <div class="amount" th:text="${'$' + #numbers.formatDecimal(auction.currentPrice, 1, 2)}">$100.00</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Buyer View -->
+          <div sec:authorize="hasRole('BUYER')">
+            <div th:if="${#lists.isEmpty(wonAuctions)}" class="empty-state">
+              <i class="bi bi-cart"></i>
+              <h3>No Purchases Yet</h3>
+              <p class="text-muted">You haven't won any auctions yet.</p>
+              <a href="/auctions/browse" class="btn btn-primary mt-3">
+                <i class="bi bi-search me-2"></i>Browse Auctions
+              </a>
+            </div>
+
+            <div th:if="${not #lists.isEmpty(wonAuctions)}" class="transaction-section">
+              <div th:each="auction : ${wonAuctions}" class="transaction-card">
+                <div class="transaction-header d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0" th:text="${auction.productName}">Product Name</h5>
+                  <span class="status-badge status-completed">Purchased</span>
+                </div>
+                <div class="transaction-body">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <p class="mb-2">
+                        <strong>Seller:</strong>
+                        <span th:text="${auction.seller.fullName}">Seller Name</span>
+                      </p>
+                      <p class="mb-2">
+                        <strong>End Date:</strong>
+                        <span th:text="${#temporals.format(auction.endTime, 'dd MMM yyyy HH:mm')}">End Date</span>
+                      </p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                      <p class="mb-2">Purchase Price:</p>
+                      <div class="amount" th:text="${'$' + #numbers.formatDecimal(auction.currentPrice, 1, 2)}">$100.00</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="transaction-footer">
+                  <div class="row align-items-center">
+                    <div class="col-md-6">
+                      <p class="mb-0"><strong>Payment Details:</strong></p>
+                      <p class="mb-0 text-muted">
+                        Bank: <span th:text="${auction.bankName}">Bank Name</span><br>
+                        Account: <span th:text="${auction.bankAccount}">Account Number</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

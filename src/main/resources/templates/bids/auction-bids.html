@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::main})}">
+<head>
+    <title th:text="${auction.productName + ' - Place Bid'}">Place Bid</title>
+</head>
+<body>
+<main>
+    <style>
+        .bid-section {
+            background: linear-gradient(135deg, #0d6efd20 0%, #0d6efd05 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .bid-form {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .bid-list {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .bid-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .bid-item:last-child {
+            border-bottom: none;
+        }
+
+        .bid-amount {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #0d6efd;
+        }
+
+        .bid-info {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+
+        .highest-bid {
+            background: #d1e7dd;
+            border-radius: 10px;
+        }
+
+        .bid-input {
+            font-size: 1.5rem;
+            padding: 1rem;
+            text-align: center;
+            border: 2px solid #0d6efd;
+            border-radius: 10px;
+        }
+
+        .bid-button {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        #bidError {
+            display: none;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 10px;
+            background: #f8d7da;
+            color: #842029;
+            text-align: center;
+        }
+
+        #bidSuccess {
+            display: none;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 10px;
+            background: #d1e7dd;
+            color: #0f5132;
+            text-align: center;
+            animation: fadeOut 3s forwards;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            70% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .bid-success {
+            animation: fadeInOut 2s ease-in-out;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+    </style>
+
+    <div class="bid-section">
+        <div class="container">
+            <!-- Back to Auction -->
+            <a th:href="@{'/auctions/' + ${auction.id}}" class="btn btn-outline-primary mb-4">
+                <i class="bi bi-arrow-left me-2"></i>Back to Auction
+            </a>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <!-- Bid List -->
+                    <div class="bid-list">
+                        <h3 class="mb-4">Bid History</h3>
+                        <div class="bid-items">
+                            <div th:if="${#lists.isEmpty(bids)}" class="text-center text-muted py-4">
+                                No bids yet. Be the first to bid!
+                            </div>
+                            <div th:each="bid, iterStat : ${bids}" 
+                                 th:class="${iterStat.first ? 'bid-item highest-bid' : 'bid-item'}">
+                                <div>
+                                    <div class="bid-amount" th:text="${'$' + #numbers.formatDecimal(bid.amount, 1, 2)}">$100.00</div>
+                                    <div class="bid-info">
+                                        <span th:text="${bid.bidder.fullName}">Bidder Name</span> •
+                                        <span th:text="${#temporals.format(bid.bidTime, 'dd MMM yyyy HH:mm')}">Bid Time</span>
+                                    </div>
+                                </div>
+                                <div th:if="${iterStat.first}" class="badge bg-success">Highest Bid</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <!-- Bid Form -->
+                    <div class="bid-form">
+                        <h3 class="mb-4">Place Your Bid</h3>
+                        <form id="bidForm" th:data-auction-id="${auction.id}">
+                            <div class="mb-4">
+                                <label for="bidAmount" class="form-label">Your Bid Amount ($)</label>
+                                <input type="number" 
+                                       class="form-control bid-input" 
+                                       id="bidAmount" 
+                                       name="amount" 
+                                       step="0.01" 
+                                       th:min="${auction.currentPrice != null ? auction.currentPrice : auction.startingPrice}"
+                                       th:placeholder="${'Min: $' + #numbers.formatDecimal(auction.currentPrice != null ? auction.currentPrice : auction.startingPrice, 1, 2)}"
+                                       required>
+                            </div>
+                            <button type="submit" class="btn btn-primary bid-button">
+                                <i class="bi bi-cash-coin me-2"></i>Place Bid
+                            </button>
+                        </form>
+                        <div id="bidError"></div>
+                        <div id="bidSuccess"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WebSocket and Bidding Scripts -->
+    <script src="/webjars/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="/webjars/stomp-websocket/2.3.4/stomp.min.js"></script>
+    <script th:inline="javascript">
+        const auctionId = /*[[${auction.id}]]*/null;
+        let stompClient = null;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+
+        function connectWebSocket() {
+            if (stompClient !== null) {
+                try {
+                    stompClient.disconnect();
+                } catch (e) {
+                    console.error('Error disconnecting:', e);
+                }
+            }
+
+            console.log('Attempting to connect to WebSocket...');
+            const socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            
+            // Disable debug logging
+            stompClient.debug = null;
+
+            stompClient.connect({}, 
+                function(frame) {
+                    console.log('Connected to WebSocket');
+                    reconnectAttempts = 0; // Reset counter on successful connection
+                    
+                    stompClient.subscribe('/topic/auction/' + auctionId, function(message) {
+                        try {
+                            const bid = JSON.parse(message.body);
+                            updateBidDisplay(bid);
+                        } catch (e) {
+                            console.error('Error processing message:', e);
+                        }
+                    });
+                },
+                function(error) {
+                    console.error('WebSocket connection error:', error);
+                    handleConnectionError();
+                }
+            );
+        }
+
+        function handleConnectionError() {
+            if (reconnectAttempts < maxReconnectAttempts) {
+                reconnectAttempts++;
+                const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 10000);
+                console.log(`Reconnecting in ${delay/1000} seconds... (Attempt ${reconnectAttempts}/${maxReconnectAttempts})`);
+                setTimeout(connectWebSocket, delay);
+            } else {
+                console.error('Max reconnection attempts reached');
+                const errorDiv = document.getElementById('bidError');
+                errorDiv.textContent = 'Connection lost. Please refresh the page to reconnect.';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function updateBidDisplay(bid) {
+            const bidItems = document.querySelector('.bid-items');
+            const emptyMessage = bidItems.querySelector('.text-center.text-muted');
+            if (emptyMessage) {
+                emptyMessage.remove();
+            }
+
+            const newBidHtml = `
+                <div class="bid-item highest-bid">
+                    <div>
+                        <div class="bid-amount">$${bid.amount.toFixed(2)}</div>
+                        <div class="bid-info">
+                            ${bid.bidderName} • ${new Date(bid.timestamp).toLocaleString()}
+                        </div>
+                    </div>
+                    <div class="badge bg-success">Highest Bid</div>
+                </div>
+            `;
+
+            // Remove highest-bid class from previous highest bid
+            const previousHighest = bidItems.querySelector('.highest-bid');
+            if (previousHighest) {
+                previousHighest.classList.remove('highest-bid');
+                previousHighest.querySelector('.badge')?.remove();
+            }
+
+            // Add new bid at the top of the bid items
+            bidItems.insertAdjacentHTML('afterbegin', newBidHtml);
+
+            // Update minimum bid amount in the form
+            const bidInput = document.getElementById('bidAmount');
+            if (bidInput) {
+                const newMinBid = bid.amount + 0.01;
+                bidInput.min = newMinBid;
+                bidInput.placeholder = `Min: $${newMinBid.toFixed(2)}`;
+            }
+        }
+
+        // Handle bid form submission
+        document.getElementById('bidForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = e.target;
+            const amount = parseFloat(form.amount.value);
+            const errorDiv = document.getElementById('bidError');
+            const successDiv = document.getElementById('bidSuccess');
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+
+            if (isNaN(amount)) {
+                errorDiv.textContent = 'Please enter a valid amount';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            fetch('/bids/place', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `auctionId=${auctionId}&amount=${amount.toFixed(2)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    form.reset();
+                    errorDiv.style.display = 'none';
+                    successDiv.textContent = 'Bid placed successfully!';
+                    successDiv.style.display = 'block';
+                    setTimeout(() => {
+                        successDiv.style.display = 'none';
+                    }, 3000);
+                } else {
+                    errorDiv.textContent = data.message;
+                    errorDiv.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error placing bid:', error);
+                errorDiv.textContent = 'An error occurred. Please try again.';
+                errorDiv.style.display = 'block';
+            });
+        });
+
+        // Connect to WebSocket when page loads
+        window.addEventListener('load', connectWebSocket);
+
+        // Reconnect when window regains focus
+        window.addEventListener('focus', function() {
+            if (!stompClient || !stompClient.connected) {
+                connectWebSocket();
+            }
+        });
+    </script>
+</main>
+</body>
+</html> 

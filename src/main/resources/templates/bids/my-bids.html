@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>My Bids - Auctions</title>
+</head>
+<body>
+<main>
+    <style>
+        .bids-header {
+            background: linear-gradient(135deg, #0d6efd20 0%, #0d6efd05 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .bid-card {
+            background: white;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .bid-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .bid-header {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .bid-body {
+            padding: 1.5rem;
+        }
+
+        .bid-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0d6efd;
+        }
+
+        .bid-info {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+
+        .bid-status {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .status-highest {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-outbid {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #664d03;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+    </style>
+
+    <div class="bids-header">
+        <div class="container">
+            <h1 class="mb-4">My Bids</h1>
+
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(bids)}" class="empty-state">
+                <i class="bi bi-cash-coin"></i>
+                <h3>No Bids Yet</h3>
+                <p class="text-muted">You haven't placed any bids yet. Start bidding to see your history here!</p>
+                <a href="/auctions/browse" class="btn btn-primary mt-3">Browse Auctions</a>
+            </div>
+
+            <!-- Bid List -->
+            <div th:if="${not #lists.isEmpty(bids)}" class="row">
+                <div class="col-12">
+                    <div th:each="bid : ${bids}" class="bid-card">
+                        <div class="bid-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0" th:text="${bid.auction.productName}">Product Name</h5>
+                            <span th:class="'bid-status ' + 
+                                         ${bid.amount == bid.auction.currentPrice ? 'status-highest' : 
+                                         (bid.auction.status.name() == 'ACTIVE' ? 'status-outbid' : 'status-pending')}"
+                                  th:text="${bid.amount == bid.auction.currentPrice ? 'Highest Bid' : 
+                                         (bid.auction.status.name() == 'ACTIVE' ? 'Outbid' : 'Auction Ended')}">
+                                Status
+                            </span>
+                        </div>
+                        <div class="bid-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    <div class="bid-amount" th:text="${'$' + #numbers.formatDecimal(bid.amount, 1, 2)}">$100.00</div>
+                                    <div class="bid-info">
+                                        <i class="bi bi-clock me-1"></i>
+                                        <span th:text="${#temporals.format(bid.bidTime, 'dd MMM yyyy HH:mm')}">Bid Time</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="text-muted mb-2">Current Price</div>
+                                    <div class="h5" th:text="${'$' + #numbers.formatDecimal(bid.auction.currentPrice, 1, 2)}">$150.00</div>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <a th:href="@{'/auctions/' + ${bid.auction.id}}" class="btn btn-outline-primary">
+                                        <i class="bi bi-eye me-2"></i>View Auction
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html> 

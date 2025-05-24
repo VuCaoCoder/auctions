@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Browse Auctions</title>
+</head>
+<body>
+<main>
+    <style>
+        .browse-header {
+            background: linear-gradient(135deg, #0d6efd20 0%, #0d6efd05 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .auction-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .auction-card {
+            background: white;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .auction-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .auction-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .auction-info {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .auction-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #212529;
+        }
+
+        .auction-description {
+            color: #6c757d;
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+
+        .auction-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .auction-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0d6efd;
+        }
+
+        .auction-time {
+            font-size: 0.875rem;
+            color: #6c757d;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+
+        .pagination {
+            margin-top: 2rem;
+            justify-content: center;
+        }
+    </style>
+
+    <div class="browse-header">
+        <div class="container">
+            <h1 class="mb-4">Browse Active Auctions</h1>
+            
+            <div class="auction-grid">
+                <!-- Empty State -->
+                <div th:if="${#lists.isEmpty(auctions)}" class="empty-state">
+                    <i class="bi bi-box"></i>
+                    <h3>No Active Auctions</h3>
+                    <p class="text-muted">There are no active auctions at the moment. Check back later!</p>
+                </div>
+
+                <!-- Auction Cards -->
+                <div th:each="auction : ${auctions}" class="auction-card">
+                    <img th:if="${auction.image}" th:src="@{'/images/auctions/' + ${auction.image}}" 
+                         th:alt="${auction.productName}" class="auction-image" />
+                    <img th:unless="${auction.image}" src="/images/placeholder.jpg" 
+                         th:alt="${auction.productName}" class="auction-image" />
+                    
+                    <div class="auction-info">
+                        <h2 class="auction-title" th:text="${auction.productName}">Product Name</h2>
+                        <p class="auction-description" th:text="${#strings.abbreviate(auction.description, 100)}">
+                            Description
+                        </p>
+                        <div class="auction-meta">
+                            <div class="auction-price" th:text="${'$' + #numbers.formatDecimal(auction.currentPrice != null ? auction.currentPrice : auction.startingPrice, 1, 2)}">
+                                $100.00
+                            </div>
+                            <div class="auction-time">
+                                <i class="bi bi-clock me-1"></i>
+                                <span th:text="${'Ends: ' + #temporals.format(auction.endTime, 'dd MMM HH:mm')}">
+                                    End Time
+                                </span>
+                            </div>
+                        </div>
+                        <a th:href="@{'/auctions/' + ${auction.id}}" class="btn btn-primary mt-3 w-100">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <nav th:if="${totalPages > 1}" aria-label="Auction navigation">
+                <ul class="pagination">
+                    <li class="page-item" th:classappend="${currentPage == 0 ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/auctions/browse(page=${currentPage - 1})}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:classappend="${currentPage == i ? 'active' : ''}">
+                        <a class="page-link" th:href="@{/auctions/browse(page=${i})}" th:text="${i + 1}">1</a>
+                    </li>
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                        <a class="page-link" th:href="@{/auctions/browse(page=${currentPage + 1})}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</main>
+</body>
+</html> 

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Won Auctions - Auctions</title>
+</head>
+<body>
+<main>
+    <style>
+        .won-header {
+            background: linear-gradient(135deg, #0d6efd20 0%, #0d6efd05 100%);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .auction-card {
+            background: white;
+            border-radius: 15px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .auction-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .auction-header {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .auction-body {
+            padding: 1.5rem;
+        }
+
+        .winning-bid {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #198754;
+        }
+
+        .auction-info {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #6c757d;
+            margin-bottom: 1rem;
+        }
+    </style>
+
+    <div class="won-header">
+        <div class="container">
+            <h1 class="mb-4">Won Auctions</h1>
+
+            <!-- Empty State -->
+            <div th:if="${#lists.isEmpty(auctions)}" class="empty-state">
+                <i class="bi bi-trophy"></i>
+                <h3>No Won Auctions Yet</h3>
+                <p class="text-muted">Keep bidding! Your winning auctions will appear here.</p>
+                <a href="/auctions/browse" class="btn btn-primary mt-3">Browse Auctions</a>
+            </div>
+
+            <!-- Won Auctions List -->
+            <div th:if="${not #lists.isEmpty(auctions)}" class="row">
+                <div class="col-12">
+                    <div th:each="auction : ${auctions}" class="auction-card">
+                        <div class="auction-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0" th:text="${auction.productName}">Product Name</h5>
+                            <span class="badge bg-success">Won</span>
+                        </div>
+                        <div class="auction-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-4">
+                                    <div class="winning-bid" th:text="${'$' + #numbers.formatDecimal(auction.currentPrice, 1, 2)}">$100.00</div>
+                                    <div class="auction-info">
+                                        <i class="bi bi-clock me-1"></i>
+                                        <span th:text="${'Ended: ' + #temporals.format(auction.endTime, 'dd MMM yyyy HH:mm')}">End Time</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="text-muted mb-2">Seller</div>
+                                    <div class="h6" th:text="${auction.seller.fullName}">Seller Name</div>
+                                    <div class="auction-info">
+                                        <i class="bi bi-bank me-1"></i>
+                                        <span th:text="${auction.bankName}">Bank Name</span>
+                                    </div>
+                                    <div class="auction-info">
+                                        <i class="bi bi-credit-card me-1"></i>
+                                        <span th:text="${auction.bankAccount}">Account Number</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <a th:href="@{'/auctions/' + ${auction.id}}" class="btn btn-outline-primary">
+                                        <i class="bi bi-eye me-2"></i>View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html> 
