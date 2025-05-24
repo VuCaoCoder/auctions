@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Xác nhận giao dịch - Auctions</title>
+</head>
+<body>
+    <main>
+        <style>
+            .transaction-confirm {
+                max-width: 800px;
+                margin: 2rem auto;
+            }
+            
+            .transaction-card {
+                background: white;
+                border-radius: 15px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+                overflow: hidden;
+            }
+            
+            .transaction-header {
+                background: linear-gradient(135deg, #0d6efd20 0%, #0d6efd05 100%);
+                padding: 2rem;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            }
+            
+            .transaction-header h2 {
+                margin: 0;
+                color: #2c3e50;
+                font-weight: 600;
+            }
+            
+            .transaction-body {
+                padding: 2rem;
+            }
+            
+            .info-alert {
+                background: #e3f2fd;
+                border-radius: 10px;
+                padding: 1rem;
+                margin-bottom: 2rem;
+                color: #0d47a1;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+            
+            .details-section {
+                background: #f8f9fa;
+                border-radius: 10px;
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+            }
+            
+            .details-section h4 {
+                color: #2c3e50;
+                margin-bottom: 1.5rem;
+                font-weight: 600;
+            }
+            
+            .detail-row {
+                display: flex;
+                justify-content: space-between;
+                padding: 0.75rem 0;
+                border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            }
+            
+            .detail-row:last-child {
+                border-bottom: none;
+            }
+            
+            .detail-label {
+                color: #6c757d;
+                font-weight: 500;
+            }
+            
+            .detail-value {
+                color: #2c3e50;
+                font-weight: 600;
+            }
+            
+            .price-value {
+                color: #0d6efd;
+                font-size: 1.25rem;
+                font-weight: 700;
+            }
+            
+            .action-buttons {
+                display: flex;
+                gap: 1rem;
+                margin-top: 2rem;
+            }
+            
+            .btn-payment {
+                padding: 0.75rem 2rem;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+        </style>
+
+        <div class="transaction-confirm">
+            <div class="transaction-card">
+                <div class="transaction-header">
+                    <h2>Xác nhận giao dịch</h2>
+                </div>
+                <div class="transaction-body">
+                    <div class="info-alert">
+                        <i class="bi bi-info-circle-fill"></i>
+                        <span>Vui lòng kiểm tra thông tin giao dịch trước khi tiến hành thanh toán.</span>
+                    </div>
+
+                    <div class="details-section">
+                        <h4>Chi tiết đấu giá</h4>
+                        <div class="detail-row">
+                            <span class="detail-label">Sản phẩm:</span>
+                            <span class="detail-value" th:text="${auction.productName}">Product Name</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Giá cuối cùng:</span>
+                            <span class="price-value" th:text="${#numbers.formatInteger(auction.currentPrice, 0, 'POINT') + ' VNĐ'}">0 VNĐ</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Người bán:</span>
+                            <span class="detail-value" th:text="${auction.seller.fullName}">Seller Name</span>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/transactions/create/{id}(id=${auction.id})}" method="post">
+                        <div class="action-buttons">
+                            <button type="submit" class="btn btn-primary btn-payment">
+                                <i class="bi bi-credit-card"></i>
+                                Tiến hành thanh toán
+                            </button>
+                            <a th:href="@{/auctions/{id}(id=${auction.id})}" class="btn btn-outline-secondary btn-payment">
+                                <i class="bi bi-x-circle"></i>
+                                Hủy bỏ
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html> 

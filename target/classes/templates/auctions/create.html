@@ -170,7 +170,7 @@
                   <div class="form-group">
                     <label for="startingPrice" class="form-label">
                       <i class="bi bi-currency-dollar text-primary"></i>
-                      Starting Price
+                      Starting Price (VNĐ)
                     </label>
                     <input
                       type="number"
@@ -179,7 +179,7 @@
                       id="startingPrice"
                       th:field="*{startingPrice}"
                       min="0"
-                      step="0.01"
+                      step="1000"
                       required
                     />
                     <div class="text-danger" th:if="${#fields.hasErrors('startingPrice')}">
@@ -198,61 +198,6 @@
                     <div class="text-danger" th:if="${#fields.hasErrors('endTime')}">
                       <i class="bi bi-exclamation-circle"></i>
                       <span th:errors="*{endTime}"></span>
-                    </div>
-                  </div>
-
-                  <!-- Bank Selection -->
-                  <div class="form-group">
-                    <label for="bankName" class="form-label">
-                      <i class="bi bi-bank text-primary"></i>
-                      Bank Name
-                    </label>
-                    <select class="form-control" th:classappend="${#fields.hasErrors('bankName')} ? 'is-invalid'" id="bankName" th:field="*{bankName}" required>
-                      <option value="">Select a bank</option>
-                      <option value="BIDV">BIDV - Ngân hàng Đầu tư và Phát triển Việt Nam</option>
-                      <option value="VCB">Vietcombank - Ngân hàng TMCP Ngoại thương Việt Nam</option>
-                      <option value="TCB">Techcombank - Ngân hàng TMCP Kỹ thương Việt Nam</option>
-                      <option value="MB">MB Bank - Ngân hàng TMCP Quân đội</option>
-                      <option value="ACB">ACB - Ngân hàng TMCP Á Châu</option>
-                      <option value="VPB">VPBank - Ngân hàng TMCP Việt Nam Thịnh Vượng</option>
-                      <option value="TPB">TPBank - Ngân hàng TMCP Tiên Phong</option>
-                      <option value="STB">Sacombank - Ngân hàng TMCP Sài Gòn Thương Tín</option>
-                      <option value="VIB">VIB - Ngân hàng TMCP Quốc tế Việt Nam</option>
-                      <option value="MSB">MSB - Ngân hàng TMCP Hàng Hải Việt Nam</option>
-                      <option value="SHB">SHB - Ngân hàng TMCP Sài Gòn - Hà Nội</option>
-                      <option value="OCB">OCB - Ngân hàng TMCP Phương Đông</option>
-                      <option value="PVB">PVcomBank - Ngân hàng TMCP Đại Chúng Việt Nam</option>
-                      <option value="SCB">SCB - Ngân hàng TMCP Sài Gòn</option>
-                      <option value="VietABank">VietABank - Ngân hàng TMCP Việt Á</option>
-                      <option value="BacABank">BacABank - Ngân hàng TMCP Bắc Á</option>
-                      <option value="HDBank">HDBank - Ngân hàng TMCP Phát triển TP.HCM</option>
-                      <option value="LPB">LienVietPostBank - Ngân hàng TMCP Bưu điện Liên Việt</option>
-                      <option value="KLB">KienLongBank - Ngân hàng TMCP Kiên Long</option>
-                      <option value="NAB">NamABank - Ngân hàng TMCP Nam Á</option>
-                      <option value="NCB">NCB - Ngân hàng TMCP Quốc Dân</option>
-                      <option value="PGB">PGBank - Ngân hàng TMCP Xăng dầu Petrolimex</option>
-                      <option value="SeABank">SeABank - Ngân hàng TMCP Đông Nam Á</option>
-                      <option value="VietBank">VietBank - Ngân hàng TMCP Việt Nam Thương Tín</option>
-                      <option value="ABB">ABBank - Ngân hàng TMCP An Bình</option>
-                      <option value="BVB">BaoVietBank - Ngân hàng TMCP Bảo Việt</option>
-                      <option value="Eximbank">Eximbank - Ngân hàng TMCP Xuất Nhập khẩu Việt Nam</option>
-                    </select>
-                    <div class="text-danger" th:if="${#fields.hasErrors('bankName')}">
-                      <i class="bi bi-exclamation-circle"></i>
-                      <span th:errors="*{bankName}"></span>
-                    </div>
-                  </div>
-
-                  <!-- Bank Account -->
-                  <div class="form-group">
-                    <label for="bankAccount" class="form-label">
-                      <i class="bi bi-credit-card text-primary"></i>
-                      Bank Account Number
-                    </label>
-                    <input type="text" class="form-control" th:classappend="${#fields.hasErrors('bankAccount')} ? 'is-invalid'" id="bankAccount" th:field="*{bankAccount}" required />
-                    <div class="text-danger" th:if="${#fields.hasErrors('bankAccount')}">
-                      <i class="bi bi-exclamation-circle"></i>
-                      <span th:errors="*{bankAccount}"></span>
                     </div>
                   </div>
 

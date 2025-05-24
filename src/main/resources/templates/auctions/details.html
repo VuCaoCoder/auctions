@@ -253,7 +253,10 @@
                 <h1 class="h2 mb-3" th:text="${auction.productName}">Product Name</h1>
 
                 <!-- Price -->
-                <div class="auction-price" th:text="${'$' + #numbers.formatDecimal(auction.startingPrice, 1, 2)}">$0.00</div>
+                <div class="price-section">
+                    <div class="price-label">Starting Price:</div>
+                    <div class="auction-price" th:text="${#numbers.formatInteger(auction.startingPrice, 0, 'POINT') + ' VNĐ'}">0 VNĐ</div>
+                </div>
 
                 <!-- Countdown Timer for Active Auctions -->
                 <div th:if="${auction.status.name() == 'ACTIVE'}" class="countdown">
@@ -394,6 +397,21 @@
                     </div>
                 </div>
 
+                <!-- Winner Actions -->
+                <div th:if="${auction.status == T(com.example.auctions.model.AuctionStatus).ENDED and auction.winner != null and auction.winner.id == #authentication.principal.id}" class="mt-4">
+                    <div class="alert alert-success">
+                        <i class="bi bi-trophy-fill me-2"></i>
+                        Congratulations! You've won this auction!
+                    </div>
+                    <form th:action="@{/transactions/create/{auctionId}(auctionId=${auction.id})}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-credit-card me-2"></i>
+                            Proceed to Payment
+                        </button>
+                    </form>
+                </div>
+
                 <!-- Seller Info -->
                 <div class="seller-info">
                   <h6 class="mb-2">Contact Information</h6>
@@ -404,14 +422,6 @@
                   <div class="meta-item">
                     <i class="bi bi-telephone"></i>
                     <span th:text="${auction.seller.phoneNumber}">Phone number</span>
-                  </div>
-                  <div class="meta-item">
-                    <i class="bi bi-bank"></i>
-                    <span th:text="${auction.bankName}">Bank name</span>
-                  </div>
-                  <div class="meta-item mb-0">
-                    <i class="bi bi-credit-card"></i>
-                    <span th:text="${auction.bankAccount}">Bank account</span>
                   </div>
                 </div>
               </div>

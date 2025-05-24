@@ -165,7 +165,7 @@
                             <div class="stat-label">Total Bids</div>
                         </div>
                         <div class="stat-item">
-                            <div class="stat-value" th:text="${'$' + #numbers.formatDecimal(auction.currentPrice, 1, 2)}">$0.00</div>
+                            <div class="stat-value" th:text="${#numbers.formatInteger(auction.currentPrice, 0, 'POINT') + ' VNĐ'}">0 VNĐ</div>
                             <div class="stat-label">Current Price</div>
                         </div>
                         <div class="stat-item">
@@ -183,7 +183,7 @@
                         <div th:each="bid, iterStat : ${auction.bids}" 
                              th:class="${iterStat.first ? 'bid-item highest-bid' : 'bid-item'}">
                             <div>
-                                <div class="bid-amount" th:text="${'$' + #numbers.formatDecimal(bid.amount, 1, 2)}">$100.00</div>
+                                <div class="bid-amount" th:text="${#numbers.formatInteger(bid.amount, 0, 'POINT') + ' VNĐ'}">100 VNĐ</div>
                                 <div class="bid-info">
                                     <span th:text="${bid.bidder.fullName}">Bidder Name</span> •
                                     <span th:text="${#temporals.format(bid.bidTime, 'dd MMM yyyy HH:mm')}">Bid Time</span>

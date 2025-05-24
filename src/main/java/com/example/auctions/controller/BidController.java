@@ -8,6 +8,7 @@ import com.example.auctions.service.AuctionService;
 import com.example.auctions.service.BidService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -128,9 +129,15 @@ public class BidController {
     }
 
     @GetMapping("/won")
-    public String viewWonAuctions(@AuthenticationPrincipal User user, Model model) {
-        List<Auction> wonAuctions = bidService.getWonAuctions(user.getId());
-        model.addAttribute("auctions", wonAuctions);
+    public String viewWonAuctions(
+            @AuthenticationPrincipal User user,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            Model model) {
+        Page<Auction> wonAuctionsPage = bidService.getWonAuctionsWithPagination(user.getId(), page, size);
+        model.addAttribute("auctions", wonAuctionsPage.getContent());
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", wonAuctionsPage.getTotalPages());
         return "bids/won-auctions";
     }
 

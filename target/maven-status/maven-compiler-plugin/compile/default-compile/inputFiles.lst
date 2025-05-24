@@ -1,3 +1,4 @@
+E:\auctions\src\main\java\com\example\auctions\service\PaymentService.java
 E:\auctions\src\main\java\com\example\auctions\config\PasswordConfig.java
 E:\auctions\src\main\java\com\example\auctions\model\Bid.java
 E:\auctions\src\main\java\com\example\auctions\model\UserRole.java
@@ -8,6 +9,7 @@ E:\auctions\src\main\java\com\example\auctions\AuctionsApplication.java
 E:\auctions\src\main\java\com\example\auctions\config\WebSocketConfig.java
 E:\auctions\src\main\java\com\example\auctions\controller\UserController.java
 E:\auctions\src\main\java\com\example\auctions\config\SecurityConfig.java
+E:\auctions\src\main\java\com\example\auctions\service\EmailService.java
 E:\auctions\src\main\java\com\example\auctions\controller\BrowseController.java
 E:\auctions\src\main\java\com\example\auctions\service\TransactionService.java
 E:\auctions\src\main\java\com\example\auctions\repository\BidRepository.java

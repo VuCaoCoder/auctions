@@ -185,7 +185,6 @@ public class AuctionController {
             auction.setId(id);
             auction.setSeller(existingAuction.getSeller());
             auction.setCreatedAt(existingAuction.getCreatedAt());
-            auction.setBankName(existingAuction.getBankName()); // Preserve bank name
             
             // Handle validation errors
             if (result.hasErrors()) {

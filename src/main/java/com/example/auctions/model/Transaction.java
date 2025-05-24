@@ -30,15 +30,26 @@ public class Transaction {
     @Column(nullable = false)
     private BigDecimal price;
 
-    @Column(nullable = false)
+    @Column(name = "transaction_date", nullable = false)
     private LocalDateTime transactionDate;
 
+    @Column(name = "auction_id")
+    private Long auctionId;
+
+    @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private TransactionStatus status;
 
     // Constructor mặc định
     public Transaction() {
         this.transactionDate = LocalDateTime.now();
+    }
+
+    public Long getAuctionId() {
+        return auctionId;
+    }
+
+    public void setAuctionId(Long auctionId) {
+        this.auctionId = auctionId;
     }
 }

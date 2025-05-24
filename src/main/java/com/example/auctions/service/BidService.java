@@ -11,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -82,6 +86,11 @@ public class BidService {
 
     public List<Auction> getWonAuctions(Long userId) {
         return bidRepository.findWonAuctionsByBidderId(userId);
+    }
+
+    public Page<Auction> getWonAuctionsWithPagination(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("endTime").descending());
+        return bidRepository.findWonAuctionsByBidderIdPaged(userId, pageable);
     }
 
     private void notifyNewBid(Long auctionId, BigDecimal amount, String bidderName) {

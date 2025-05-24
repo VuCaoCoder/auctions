@@ -131,7 +131,7 @@
                             <div th:each="bid, iterStat : ${bids}" 
                                  th:class="${iterStat.first ? 'bid-item highest-bid' : 'bid-item'}">
                                 <div>
-                                    <div class="bid-amount" th:text="${'$' + #numbers.formatDecimal(bid.amount, 1, 2)}">$100.00</div>
+                                    <div class="bid-amount" th:text="${#numbers.formatInteger(bid.amount, 0, 'POINT') + ' VNĐ'}">10000 VNĐ</div>
                                     <div class="bid-info">
                                         <span th:text="${bid.bidder.fullName}">Bidder Name</span> •
                                         <span th:text="${#temporals.format(bid.bidTime, 'dd MMM yyyy HH:mm')}">Bid Time</span>
@@ -148,15 +148,16 @@
                     <div class="bid-form">
                         <h3 class="mb-4">Place Your Bid</h3>
                         <form id="bidForm" th:data-auction-id="${auction.id}">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                             <div class="mb-4">
-                                <label for="bidAmount" class="form-label">Your Bid Amount ($)</label>
-                                <input type="number" 
+                                <label for="bidAmount" class="form-label">Your Bid Amount (VNĐ)</label>
+                                <input type="text" 
                                        class="form-control bid-input" 
                                        id="bidAmount" 
                                        name="amount" 
-                                       step="0.01" 
                                        th:min="${auction.currentPrice != null ? auction.currentPrice : auction.startingPrice}"
-                                       th:placeholder="${'Min: $' + #numbers.formatDecimal(auction.currentPrice != null ? auction.currentPrice : auction.startingPrice, 1, 2)}"
+                                       th:placeholder="${'Min: ' + #numbers.formatInteger(auction.currentPrice != null ? auction.currentPrice : auction.startingPrice, 0, 'POINT') + ' VNĐ'}"
+                                       onblur="formatBidAmount(this)"
                                        required>
                             </div>
                             <button type="submit" class="btn btn-primary bid-button">
@@ -175,6 +176,22 @@
     <script src="/webjars/sockjs-client/1.5.1/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/2.3.4/stomp.min.js"></script>
     <script th:inline="javascript">
+        function formatBidAmount(input) {
+            // Get the value and remove all spaces and dots
+            let value = input.value.replace(/[\s.]/g, '');
+            
+            // Parse as integer
+            value = parseInt(value);
+            
+            // Format with thousand separators if it's a valid number
+            if (!isNaN(value)) {
+                // Store actual value as a data attribute
+                input.dataset.value = value;
+                // Display formatted value with dots
+                input.value = value.toLocaleString('vi-VN').replace(/,/g, '.');
+            }
+        }
+        
         const auctionId = /*[[${auction.id}]]*/null;
         let stompClient = null;
         let reconnectAttempts = 0;
@@ -241,7 +258,7 @@
             const newBidHtml = `
                 <div class="bid-item highest-bid">
                     <div>
-                        <div class="bid-amount">$${bid.amount.toFixed(2)}</div>
+                        <div class="bid-amount">${Math.round(bid.amount).toLocaleString()} VNĐ</div>
                         <div class="bid-info">
                             ${bid.bidderName} • ${new Date(bid.timestamp).toLocaleString()}
                         </div>
@@ -263,9 +280,9 @@
             // Update minimum bid amount in the form
             const bidInput = document.getElementById('bidAmount');
             if (bidInput) {
-                const newMinBid = bid.amount + 0.01;
+                const newMinBid = Math.round(bid.amount + 1000);
                 bidInput.min = newMinBid;
-                bidInput.placeholder = `Min: $${newMinBid.toFixed(2)}`;
+                bidInput.placeholder = `Min: ${newMinBid.toLocaleString()} VNĐ`;
             }
         }
 
@@ -273,24 +290,32 @@
         document.getElementById('bidForm')?.addEventListener('submit', function(e) {
             e.preventDefault();
             const form = e.target;
-            const amount = parseFloat(form.amount.value);
+            const bidInput = form.amount;
+            const csrfToken = form.querySelector('input[name="_csrf"]').value;
+            // Get the raw value and remove any dots
+            let amount = bidInput.value.replace(/\./g, '');
+            amount = parseInt(amount);
+            
+            // Validate if it's a multiple of 1000
+            if (amount % 1000 !== 0) {
+                const errorDiv = document.getElementById('bidError');
+                errorDiv.textContent = 'Bid amount must be a multiple of 1,000 VNĐ';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
             const errorDiv = document.getElementById('bidError');
             const successDiv = document.getElementById('bidSuccess');
             errorDiv.style.display = 'none';
             successDiv.style.display = 'none';
 
-            if (isNaN(amount)) {
-                errorDiv.textContent = 'Please enter a valid amount';
-                errorDiv.style.display = 'block';
-                return;
-            }
-
             fetch('/bids/place', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRF-TOKEN': csrfToken
                 },
-                body: `auctionId=${auctionId}&amount=${amount.toFixed(2)}`
+                body: `auctionId=${auctionId}&amount=${amount}&_csrf=${csrfToken}`
             })
             .then(response => response.json())
             .then(data => {

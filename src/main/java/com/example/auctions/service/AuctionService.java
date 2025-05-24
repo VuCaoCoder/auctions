@@ -7,6 +7,9 @@ import com.example.auctions.model.User;
 import com.example.auctions.repository.AuctionRepository;
 import com.example.auctions.repository.BidRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.mail.MessagingException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -33,6 +36,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Service
 public class AuctionService {
 
+    private static final Logger logger = LoggerFactory.getLogger(AuctionService.class);
+
     @Value("${auction.images.upload.path}")
     private String uploadPath;
 
@@ -44,6 +49,9 @@ public class AuctionService {
 
     @Autowired
     private SimpMessagingTemplate messagingTemplate;
+
+    @Autowired
+    private EmailService emailService;
 
     @PostConstruct
     public void init() {
@@ -188,15 +196,37 @@ public class AuctionService {
 
     @Transactional
     public void endAuction(Auction auction) {
+        logger.info("Starting to end auction ID: {}", auction.getId());
+        
         // Find the highest bid
         Optional<Bid> highestBid = bidRepository.findTopByAuctionOrderByAmountDesc(auction);
+        logger.debug("Highest bid found: {}", highestBid.isPresent() ? highestBid.get().getAmount() : "No bids");
         
         // Update auction status and winner
         auction.setStatus(AuctionStatus.ENDED);
-        highestBid.ifPresent(bid -> auction.setWinner(bid.getBidder()));
+        final Auction finalAuction = auction;
+        highestBid.ifPresent(bid -> {
+            finalAuction.setWinner(bid.getBidder());
+            logger.info("Setting winner for auction {}: {}", finalAuction.getId(), bid.getBidder().getEmail());
+        });
         
         // Save the auction
-        auctionRepository.save(auction);
+        auction = auctionRepository.save(finalAuction);
+        logger.debug("Auction saved with status ENDED");
+        
+        // Send email notification to winner if exists
+        if (auction.getWinner() != null) {
+            try {
+                logger.info("Attempting to send winner notification email");
+                emailService.sendAuctionWonEmail(auction);
+                logger.info("Winner notification email sent successfully");
+            } catch (MessagingException e) {
+                // Log error but don't stop the process
+                logger.error("Failed to send auction won email: " + e.getMessage(), e);
+            }
+        } else {
+            logger.info("No winner to notify for auction ID: {}", auction.getId());
+        }
         
         // Notify participants about auction end
         String destination = "/topic/auction/" + auction.getId();
@@ -206,6 +236,9 @@ public class AuctionService {
             highestBid.map(bid -> bid.getBidder().getFullName()).orElse(null)
         );
         messagingTemplate.convertAndSend(destination, message);
+        logger.debug("WebSocket notification sent for auction end");
+        
+        logger.info("Auction ID: {} ended successfully", auction.getId());
     }
 
     public Page<Auction> getAuctionsBySeller(User seller, int page, int size) {

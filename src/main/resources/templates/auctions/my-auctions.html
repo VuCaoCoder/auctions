@@ -146,7 +146,10 @@
               <h5 class="mb-2" th:text="${auction.productName}">Product Name</h5>
               <p class="text-muted mb-3" th:text="${#strings.abbreviate(auction.description, 100)}">Description</p>
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="auction-price" th:text="${'$' + #numbers.formatDecimal(auction.startingPrice, 1, 2)}">Price</div>
+                <div class="price-label">Starting Price:</div>
+                <div class="auction-price" th:text="${#numbers.formatInteger(auction.startingPrice, 0, 'POINT') + ' VNĐ'}">0 VNĐ</div>
+              </div>
+              <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="auction-time">
                   <i class="bi bi-clock me-1"></i>
                   <span th:if="${auction.status == 'DRAFT'}">Not started</span>

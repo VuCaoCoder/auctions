@@ -86,7 +86,7 @@
                         <div class="auction-body">
                             <div class="row align-items-center">
                                 <div class="col-md-4">
-                                    <div class="winning-bid" th:text="${'$' + #numbers.formatDecimal(auction.currentPrice, 1, 2)}">$100.00</div>
+                                    <div class="winning-bid" th:text="${#numbers.formatInteger(auction.currentPrice, 0, 'POINT') + ' VNĐ'}">100 VNĐ</div>
                                     <div class="auction-info">
                                         <i class="bi bi-clock me-1"></i>
                                         <span th:text="${'Ended: ' + #temporals.format(auction.endTime, 'dd MMM yyyy HH:mm')}">End Time</span>
@@ -95,14 +95,6 @@
                                 <div class="col-md-4">
                                     <div class="text-muted mb-2">Seller</div>
                                     <div class="h6" th:text="${auction.seller.fullName}">Seller Name</div>
-                                    <div class="auction-info">
-                                        <i class="bi bi-bank me-1"></i>
-                                        <span th:text="${auction.bankName}">Bank Name</span>
-                                    </div>
-                                    <div class="auction-info">
-                                        <i class="bi bi-credit-card me-1"></i>
-                                        <span th:text="${auction.bankAccount}">Account Number</span>
-                                    </div>
                                 </div>
                                 <div class="col-md-4 text-md-end">
                                     <a th:href="@{'/auctions/' + ${auction.id}}" class="btn btn-outline-primary">
@@ -114,6 +106,28 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Pagination -->
+            <nav aria-label="Page navigation" class="mt-4" th:if="${totalPages > 1}">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/bids/won-auctions(page=${currentPage - 1})}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+
+                    <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}" 
+                        th:classappend="${pageNum == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/bids/won-auctions(page=${pageNum})}" th:text="${pageNum + 1}">1</a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/bids/won-auctions(page=${currentPage + 1})}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </main>

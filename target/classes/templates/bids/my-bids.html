@@ -115,7 +115,7 @@
                         <div class="bid-body">
                             <div class="row align-items-center">
                                 <div class="col-md-4">
-                                    <div class="bid-amount" th:text="${'$' + #numbers.formatDecimal(bid.amount, 1, 2)}">$100.00</div>
+                                    <div class="bid-amount" th:text="${#numbers.formatInteger(bid.amount, 0, 'POINT') + ' VNĐ'}">100 VNĐ</div>
                                     <div class="bid-info">
                                         <i class="bi bi-clock me-1"></i>
                                         <span th:text="${#temporals.format(bid.bidTime, 'dd MMM yyyy HH:mm')}">Bid Time</span>
@@ -123,7 +123,7 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="text-muted mb-2">Current Price</div>
-                                    <div class="h5" th:text="${'$' + #numbers.formatDecimal(bid.auction.currentPrice, 1, 2)}">$150.00</div>
+                                    <div class="h5" th:text="${#numbers.formatInteger(bid.auction.currentPrice, 0, 'POINT') + ' VNĐ'}">150 VNĐ</div>
                                 </div>
                                 <div class="col-md-4 text-md-end">
                                     <a th:href="@{'/auctions/' + ${bid.auction.id}}" class="btn btn-outline-primary">

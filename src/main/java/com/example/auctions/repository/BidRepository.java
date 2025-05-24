@@ -9,6 +9,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Repository
 public interface BidRepository extends JpaRepository<Bid, Long> {
@@ -24,4 +26,7 @@ public interface BidRepository extends JpaRepository<Bid, Long> {
     
     @Query("SELECT DISTINCT a FROM Auction a WHERE a.status = 'ENDED' AND EXISTS (SELECT 1 FROM Bid b WHERE b.auction = a AND b.bidder.id = :bidderId AND b.amount = (SELECT MAX(b2.amount) FROM Bid b2 WHERE b2.auction = a))")
     List<Auction> findWonAuctionsByBidderId(@Param("bidderId") Long bidderId);
+    
+    @Query("SELECT DISTINCT a FROM Auction a WHERE a.status = 'ENDED' AND EXISTS (SELECT 1 FROM Bid b WHERE b.auction = a AND b.bidder.id = :bidderId AND b.amount = (SELECT MAX(b2.amount) FROM Bid b2 WHERE b2.auction = a))")
+    Page<Auction> findWonAuctionsByBidderIdPaged(@Param("bidderId") Long bidderId, Pageable pageable);
 } 

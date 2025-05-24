@@ -126,8 +126,8 @@
                             Description
                         </p>
                         <div class="auction-meta">
-                            <div class="auction-price" th:text="${'$' + #numbers.formatDecimal(auction.currentPrice != null ? auction.currentPrice : auction.startingPrice, 1, 2)}">
-                                $100.00
+                            <div class="auction-price" th:text="${#numbers.formatInteger(auction.currentPrice != null ? auction.currentPrice : auction.startingPrice, 0, 'POINT') + ' VNĐ'}">
+                                10000 VNĐ
                             </div>
                             <div class="auction-time">
                                 <i class="bi bi-clock me-1"></i>

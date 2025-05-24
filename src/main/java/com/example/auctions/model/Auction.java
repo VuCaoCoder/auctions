@@ -42,14 +42,6 @@ public class Auction {
     @Column(name = "end_time")
     private LocalDateTime endTime;
 
-    @NotBlank(message = "Bank name is required")
-    @Column(name = "bank_name")
-    private String bankName;
-
-    @NotBlank(message = "Bank account number is required")
-    @Pattern(regexp = "^[0-9]{10,16}$", message = "Bank account number must be between 10 and 16 digits")
-    private String bankAccount;
-
     @Column(name = "image")
     private String image;
 

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::title}, ~{::main})}">
+<head>
+    <title>Payment Result - Auctions</title>
+</head>
+<body>
+    <main>
+        <div class="container py-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="card shadow-sm">
+                        <div class="card-body text-center p-5">
+                            <!-- Success Icon -->
+                            <div th:if="${status == 'success'}" class="mb-4">
+                                <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                            </div>
+                            <!-- Error Icon -->
+                            <div th:if="${status == 'error'}" class="mb-4">
+                                <i class="bi bi-x-circle-fill text-danger" style="font-size: 4rem;"></i>
+                            </div>
+
+                            <h2 class="mb-4" th:text="${message}">Payment Result</h2>
+
+                            <!-- Success Message -->
+                            <div th:if="${status == 'success'}" class="alert alert-success" role="alert">
+                                <p class="mb-0">Your payment has been processed successfully.</p>
+                                <p class="mb-0">A confirmation email has been sent to your email address.</p>
+                            </div>
+
+                            <!-- Error Message -->
+                            <div th:if="${status == 'error'}" class="alert alert-danger" role="alert">
+                                <p class="mb-0">There was a problem processing your payment.</p>
+                                <p class="mb-0">Please try again or contact support if the problem persists.</p>
+                            </div>
+
+                            <div class="mt-4">
+                                <a href="/transactions/history" class="btn btn-primary me-2">
+                                    <i class="bi bi-clock-history me-2"></i>View Transaction History
+                                </a>
+                                <a href="/auctions/browse" class="btn btn-outline-primary">
+                                    <i class="bi bi-shop me-2"></i>Continue Shopping
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html> 
