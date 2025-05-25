@@ -57,11 +57,4 @@ public class UserController {
         userService.updateUser(user);
         return "redirect:/profile?updated";
     }
-
-    @GetMapping("/dashboard")
-    public String showDashboard(Authentication authentication, Model model) {
-        User user = userService.getCurrentUser(authentication.getName());
-        model.addAttribute("user", user);
-        return "dashboard";
-    }
 }

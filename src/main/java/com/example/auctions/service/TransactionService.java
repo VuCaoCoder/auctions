@@ -47,6 +47,14 @@ public class TransactionService {
         return transactionRepository.findBySellerOrderByTransactionDateDesc(seller);
     }
 
+    public BigDecimal getTotalSpentByBuyer(User buyer) {
+        return transactionRepository.sumTotalSpentByBuyer(buyer);
+    }
+
+    public BigDecimal getTotalSalesBySeller(User seller) {
+        return transactionRepository.sumTotalSalesBySeller(seller);
+    }
+
     public Transaction findById(Long id) {
         return transactionRepository.findByIdWithUsers(id)
                 .orElseThrow(() -> new RuntimeException("Transaction not found with id: " + id));

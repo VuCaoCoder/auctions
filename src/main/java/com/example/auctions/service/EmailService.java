@@ -5,14 +5,18 @@ import com.example.auctions.model.Transaction;
 import com.example.auctions.model.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.mail.internet.InternetAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
+
+import java.io.UnsupportedEncodingException;
 
 @Service
 public class EmailService {
@@ -20,6 +24,9 @@ public class EmailService {
     private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
+    
+    @Value("${spring.mail.username}")
+    private String fromEmail;
 
     @Autowired
     public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
@@ -45,6 +52,12 @@ public class EmailService {
             
             String recipientEmail = auction.getWinner().getEmail();
             helper.setTo(recipientEmail);
+            try {
+                helper.setFrom(new InternetAddress(fromEmail, "Auctions System"));
+            } catch (UnsupportedEncodingException e) {
+                logger.error("Error setting email sender name", e);
+                helper.setFrom(fromEmail); // Fallback to email address only
+            }
             helper.setSubject("Congratulations! You've won the auction: " + auction.getProductName());
             helper.setText(emailContent, true);
 
@@ -72,6 +85,12 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(transaction.getBuyer().getEmail());
+            try {
+                helper.setFrom(new InternetAddress(fromEmail, "Auctions System"));
+            } catch (UnsupportedEncodingException e) {
+                logger.error("Error setting email sender name", e);
+                helper.setFrom(fromEmail); // Fallback to email address only
+            }
             helper.setSubject("Invoice for Your Auction Purchase");
             helper.setText(emailContent, true);
 
@@ -103,6 +122,12 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             helper.setTo(transaction.getSeller().getEmail());
+            try {
+                helper.setFrom(new InternetAddress(fromEmail, "Auctions System"));
+            } catch (UnsupportedEncodingException e) {
+                logger.error("Error setting email sender name", e);
+                helper.setFrom(fromEmail); // Fallback to email address only
+            }
             helper.setSubject("Payment Received for Your Auction Item");
             helper.setText(emailContent, true);
             logger.info("Email message created successfully");

@@ -11,6 +11,19 @@
             border-radius: 20px;
             padding: 2rem;
             margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .active-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1" fill="%230d6efd10"/></svg>') repeat;
+            opacity: 0.5;
         }
 
         .bid-card {
@@ -18,19 +31,24 @@
             border-radius: 15px;
             border: 1px solid rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
         .bid-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-color: #0d6efd;
         }
 
         .bid-header {
-            padding: 1rem;
-            background: #f8f9fa;
+            padding: 1.25rem;
+            background: linear-gradient(to right, #f8f9fa, white);
             border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .bid-body {
@@ -38,46 +56,119 @@
         }
 
         .bid-amount {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             font-weight: 700;
-            color: #0d6efd;
+            background: linear-gradient(45deg, #0d6efd, #00c6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
         }
 
         .bid-info {
             color: #6c757d;
-            font-size: 0.875rem;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .bid-status {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
             padding: 0.5rem 1rem;
             border-radius: 20px;
             font-weight: 600;
             font-size: 0.875rem;
+            transition: all 0.3s ease;
         }
 
         .status-highest {
-            background: #d1e7dd;
+            background: linear-gradient(135deg, #d1e7dd, #a3cfbb);
             color: #0f5132;
         }
 
         .status-outbid {
-            background: #f8d7da;
+            background: linear-gradient(135deg, #f8d7da, #f5c2c7);
             color: #842029;
         }
 
         .empty-state {
             text-align: center;
-            padding: 3rem;
+            padding: 4rem 2rem;
             background: white;
-            border-radius: 15px;
+            border-radius: 20px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 2px dashed #e9ecef;
         }
 
         .empty-state i {
             font-size: 4rem;
-            color: #6c757d;
+            background: linear-gradient(45deg, #0d6efd, #00c6ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state h3 {
+            color: #343a40;
             margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: #6c757d;
+            margin-bottom: 2rem;
+        }
+
+        .empty-state .btn {
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        /* Custom Pagination Styles */
+        .custom-pagination {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .custom-pagination .pagination {
+            margin-bottom: 0;
+            gap: 0.5rem;
+        }
+
+        .custom-pagination .page-item {
+            margin: 0 2px;
+        }
+
+        .custom-pagination .page-link {
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            color: #6c757d;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .custom-pagination .page-link:hover {
+            background: #e9ecef;
+            color: #0d6efd;
+            transform: translateY(-2px);
+        }
+
+        .custom-pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, #0d6efd, #00c6ff);
+            color: white;
+            box-shadow: 0 4px 8px rgba(13, 110, 253, 0.2);
+        }
+
+        .custom-pagination .page-item.disabled .page-link {
+            background: #f8f9fa;
+            color: #adb5bd;
+            cursor: not-allowed;
         }
     </style>
 
@@ -90,14 +181,16 @@
                 <i class="bi bi-clock-history"></i>
                 <h3>No Active Bids</h3>
                 <p class="text-muted">You don't have any active bids at the moment.</p>
-                <a href="/auctions/browse" class="btn btn-primary mt-3">Browse Auctions</a>
+                <a href="/auctions/browse" class="btn btn-primary">
+                    <i class="bi bi-search me-2"></i>Browse Auctions
+                </a>
             </div>
 
             <!-- Active Bids List -->
             <div th:if="${not #lists.isEmpty(bids)}" class="row">
                 <div class="col-12">
                     <div th:each="bid : ${bids}" class="bid-card">
-                        <div class="bid-header d-flex justify-content-between align-items-center">
+                        <div class="bid-header">
                             <h5 class="mb-0" th:text="${bid.auction.productName}">Product Name</h5>
                             <span th:class="'bid-status ' + ${bid.amount == bid.auction.currentPrice ? 'status-highest' : 'status-outbid'}"
                                   th:text="${bid.amount == bid.auction.currentPrice ? 'Highest Bid' : 'Outbid'}">
@@ -107,17 +200,17 @@
                         <div class="bid-body">
                             <div class="row align-items-center">
                                 <div class="col-md-4">
-                                    <div class="bid-amount" th:text="${'$' + #numbers.formatDecimal(bid.amount, 1, 2)}">$100.00</div>
+                                    <div class="bid-amount" th:text="${#numbers.formatInteger(bid.amount, 0, 'POINT') + ' VNĐ'}">100 VNĐ</div>
                                     <div class="bid-info">
-                                        <i class="bi bi-clock me-1"></i>
+                                        <i class="bi bi-clock"></i>
                                         <span th:text="${#temporals.format(bid.bidTime, 'dd MMM yyyy HH:mm')}">Bid Time</span>
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="text-muted mb-2">Current Price</div>
-                                    <div class="h5" th:text="${'$' + #numbers.formatDecimal(bid.auction.currentPrice, 1, 2)}">$150.00</div>
+                                    <div class="h5" th:text="${#numbers.formatInteger(bid.auction.currentPrice, 0, 'POINT') + ' VNĐ'}">150 VNĐ</div>
                                     <div class="bid-info">
-                                        <i class="bi bi-alarm me-1"></i>
+                                        <i class="bi bi-alarm"></i>
                                         <span th:text="${'Ends: ' + #temporals.format(bid.auction.endTime, 'dd MMM yyyy HH:mm')}">End Time</span>
                                     </div>
                                 </div>
@@ -131,6 +224,28 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Pagination -->
+            <nav th:if="${totalPages > 1}" class="custom-pagination">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                        <a class="page-link" th:href="@{/bids/active-bids(page=${currentPage - 1})}" aria-label="Previous">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    <li class="page-item" th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}" 
+                        th:classappend="${pageNum == currentPage} ? 'active'">
+                        <a class="page-link" th:href="@{/bids/active-bids(page=${pageNum})}" th:text="${pageNum + 1}">1</a>
+                    </li>
+
+                    <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/bids/active-bids(page=${currentPage + 1})}" aria-label="Next">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </div>
 </main>

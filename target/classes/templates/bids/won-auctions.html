@@ -11,6 +11,19 @@
             border-radius: 20px;
             padding: 2rem;
             margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .won-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1" fill="%230d6efd10"/></svg>') repeat;
+            opacity: 0.5;
         }
 
         .auction-card {
@@ -18,19 +31,24 @@
             border-radius: 15px;
             border: 1px solid rgba(0, 0, 0, 0.1);
             overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
         .auction-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-color: #0d6efd;
         }
 
         .auction-header {
-            padding: 1rem;
-            background: #f8f9fa;
+            padding: 1.25rem;
+            background: linear-gradient(to right, #f8f9fa, white);
             border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .auction-body {
@@ -38,28 +56,120 @@
         }
 
         .winning-bid {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             font-weight: 700;
-            color: #198754;
+            background: linear-gradient(45deg, #198754, #20c997);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
         }
 
         .auction-info {
             color: #6c757d;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge.bg-success {
+            background: linear-gradient(135deg, #198754, #20c997) !important;
+            padding: 0.5rem 1rem;
             font-size: 0.875rem;
+            border-radius: 20px;
+            box-shadow: 0 2px 4px rgba(25, 135, 84, 0.2);
         }
 
         .empty-state {
             text-align: center;
-            padding: 3rem;
+            padding: 4rem 2rem;
             background: white;
-            border-radius: 15px;
+            border-radius: 20px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border: 2px dashed #e9ecef;
         }
 
         .empty-state i {
             font-size: 4rem;
-            color: #6c757d;
+            background: linear-gradient(45deg, #198754, #20c997);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state h3 {
+            color: #343a40;
             margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: #6c757d;
+            margin-bottom: 2rem;
+        }
+
+        .empty-state .btn {
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        /* Custom Pagination Styles */
+        .custom-pagination {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .custom-pagination .pagination {
+            margin-bottom: 0;
+            gap: 0.5rem;
+        }
+
+        .custom-pagination .page-item {
+            margin: 0 2px;
+        }
+
+        .custom-pagination .page-link {
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            color: #6c757d;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .custom-pagination .page-link:hover {
+            background: #e9ecef;
+            color: #198754;
+            transform: translateY(-2px);
+        }
+
+        .custom-pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, #198754, #20c997);
+            color: white;
+            box-shadow: 0 4px 8px rgba(25, 135, 84, 0.2);
+        }
+
+        .custom-pagination .page-item.disabled .page-link {
+            background: #f8f9fa;
+            color: #adb5bd;
+            cursor: not-allowed;
+        }
+
+        .btn-outline-primary {
+            border-color: #198754;
+            color: #198754;
+        }
+
+        .btn-outline-primary:hover {
+            background: linear-gradient(135deg, #198754, #20c997);
+            border-color: transparent;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(25, 135, 84, 0.2);
         }
     </style>
 
@@ -72,14 +182,16 @@
                 <i class="bi bi-trophy"></i>
                 <h3>No Won Auctions Yet</h3>
                 <p class="text-muted">Keep bidding! Your winning auctions will appear here.</p>
-                <a href="/auctions/browse" class="btn btn-primary mt-3">Browse Auctions</a>
+                <a href="/auctions/browse" class="btn btn-primary">
+                    <i class="bi bi-search me-2"></i>Browse Auctions
+                </a>
             </div>
 
             <!-- Won Auctions List -->
             <div th:if="${not #lists.isEmpty(auctions)}" class="row">
                 <div class="col-12">
                     <div th:each="auction : ${auctions}" class="auction-card">
-                        <div class="auction-header d-flex justify-content-between align-items-center">
+                        <div class="auction-header">
                             <h5 class="mb-0" th:text="${auction.productName}">Product Name</h5>
                             <span class="badge bg-success">Won</span>
                         </div>
@@ -88,7 +200,7 @@
                                 <div class="col-md-4">
                                     <div class="winning-bid" th:text="${#numbers.formatInteger(auction.currentPrice, 0, 'POINT') + ' VNĐ'}">100 VNĐ</div>
                                     <div class="auction-info">
-                                        <i class="bi bi-clock me-1"></i>
+                                        <i class="bi bi-clock"></i>
                                         <span th:text="${'Ended: ' + #temporals.format(auction.endTime, 'dd MMM yyyy HH:mm')}">End Time</span>
                                     </div>
                                 </div>
@@ -108,11 +220,11 @@
             </div>
 
             <!-- Pagination -->
-            <nav aria-label="Page navigation" class="mt-4" th:if="${totalPages > 1}">
+            <nav th:if="${totalPages > 1}" class="custom-pagination">
                 <ul class="pagination justify-content-center">
                     <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
                         <a class="page-link" th:href="@{/bids/won-auctions(page=${currentPage - 1})}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
+                            <i class="bi bi-chevron-left"></i>
                         </a>
                     </li>
 
@@ -123,7 +235,7 @@
 
                     <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
                         <a class="page-link" th:href="@{/bids/won-auctions(page=${currentPage + 1})}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
+                            <i class="bi bi-chevron-right"></i>
                         </a>
                     </li>
                 </ul>

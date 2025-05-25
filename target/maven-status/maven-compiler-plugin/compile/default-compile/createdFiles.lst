@@ -8,13 +8,17 @@ com\example\auctions\model\TransactionStatus.class
 com\example\auctions\config\SecurityConfig.class
 com\example\auctions\model\Transaction.class
 com\example\auctions\model\AuctionStatus.class
+com\example\auctions\controller\ReportController.class
 com\example\auctions\repository\TransactionRepository.class
 com\example\auctions\controller\HomeController.class
 com\example\auctions\service\PaymentService.class
 com\example\auctions\repository\BidRepository.class
+com\example\auctions\config\WebConfig.class
 com\example\auctions\controller\TransactionController.class
 com\example\auctions\controller\BrowseController.class
+com\example\auctions\controller\DashboardController.class
 com\example\auctions\controller\ImageController.class
+com\example\auctions\service\ReportService.class
 com\example\auctions\controller\AuctionManagementController.class
 com\example\auctions\service\EmailService.class
 com\example\auctions\AuctionsApplication.class
@@ -25,6 +29,7 @@ com\example\auctions\repository\UserRepository.class
 com\example\auctions\service\UserService.class
 com\example\auctions\service\AuctionService$AuctionEndMessage.class
 com\example\auctions\service\AuctionService.class
+com\example\auctions\service\ReportService$Report.class
 com\example\auctions\model\UserRole.class
 com\example\auctions\controller\AuctionController.class
 com\example\auctions\model\Auction.class

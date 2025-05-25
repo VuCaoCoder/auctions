@@ -7,81 +7,297 @@
     <main>
       <style>
         .hero-section {
-          background: linear-gradient(135deg, #0d6efd20 0%, #0d6efd05 100%);
-          border-radius: 0 0 50px 50px;
-          padding: 6rem 0;
+          background: linear-gradient(135deg, #0d6efd10 0%, #0099ff05 100%);
+          border-radius: 0 0 80px 80px;
+          padding: 8rem 0;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .hero-image-container {
+          position: relative;
+          padding: 2rem;
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.4) 100%);
+          border-radius: 30px;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+          animation: float 6s ease-in-out infinite;
+        }
+
+        .hero-image-container::before {
+          content: '';
+          position: absolute;
+          top: -10px;
+          left: -10px;
+          right: -10px;
+          bottom: -10px;
+          background: linear-gradient(135deg, #0d6efd20 0%, #00c6ff20 100%);
+          border-radius: 40px;
+          z-index: -1;
+        }
+
+        .hero-image-container img {
+          border-radius: 20px;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+          transition: transform 0.3s ease;
+        }
+
+        .hero-image-container:hover img {
+          transform: scale(1.02);
+        }
+
+        @keyframes float {
+          0% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+          100% {
+            transform: translateY(0px);
+          }
         }
 
         .hero-title {
-          font-size: 3.5rem;
+          font-size: 4rem;
           font-weight: 800;
-          background: linear-gradient(45deg, #0d6efd, #0099ff);
+          background: linear-gradient(45deg, #0d6efd, #00c6ff);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           margin-bottom: 1.5rem;
+          animation: fadeInUp 1s ease;
+        }
+
+        .hero-subtitle {
+          font-size: 1.25rem;
+          color: #4a5568;
+          line-height: 1.8;
+          margin-bottom: 2rem;
+          animation: fadeInUp 1s ease 0.2s;
+          opacity: 0;
+          animation-fill-mode: forwards;
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
 
         .feature-card {
           background: white;
-          border-radius: 15px;
-          padding: 2rem;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-          border: 1px solid rgba(0, 0, 0, 0.1);
+          border-radius: 20px;
+          padding: 2.5rem;
+          transition: all 0.3s ease;
+          border: 2px solid #e2e8f0;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .feature-card::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 4px;
+          background: linear-gradient(135deg, #0d6efd 0%, #00c6ff 100%);
+          opacity: 0;
+          transition: opacity 0.3s ease;
         }
 
         .feature-card:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+          transform: translateY(-10px);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+          border-color: #0d6efd;
+        }
+
+        .feature-card:hover::before {
+          opacity: 1;
         }
 
         .icon-square {
-          width: 48px;
-          height: 48px;
-          border-radius: 12px;
-          background: linear-gradient(135deg, #0d6efd 0%, #0099ff 100%);
+          width: 64px;
+          height: 64px;
+          border-radius: 16px;
+          background: linear-gradient(135deg, #0d6efd 0%, #00c6ff 100%);
           color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.75rem;
+          margin-bottom: 1.5rem;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .icon-square::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 100%);
         }
 
         .stats-section {
-          background-color: #f8f9fa;
-          padding: 4rem 0;
-          border-radius: 50px;
-          margin: 3rem 0;
+          background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+          padding: 6rem 0;
+          border-radius: 80px;
+          margin: 4rem 0;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .stats-section::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1" fill="%230d6efd05"/></svg>') repeat;
+          opacity: 0.5;
         }
 
         .stat-card {
           text-align: center;
-          padding: 1.5rem;
+          padding: 2rem;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+          transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
         }
 
         .stat-number {
-          font-size: 2.5rem;
-          font-weight: 700;
-          color: #0d6efd;
+          font-size: 3rem;
+          font-weight: 800;
+          background: linear-gradient(45deg, #0d6efd, #00c6ff);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
           margin-bottom: 0.5rem;
         }
 
         .cta-section {
-          background: linear-gradient(135deg, #0d6efd 0%, #0099ff 100%);
+          background: linear-gradient(135deg, #0d6efd 0%, #00c6ff 100%);
           color: white;
-          padding: 4rem 0;
-          border-radius: 50px;
-          margin: 3rem 0;
+          padding: 6rem 0;
+          border-radius: 80px;
+          margin: 4rem 0;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .cta-section::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: url('data:image/svg+xml,<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><rect width="1" height="1" fill="%23FFFFFF10"/></svg>') repeat;
+          opacity: 0.2;
+        }
+
+        .btn-hero {
+          padding: 1rem 2.5rem;
+          font-weight: 600;
+          border-radius: 15px;
+          transition: all 0.3s ease;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .btn-hero.btn-primary {
+          background: linear-gradient(135deg, #0d6efd 0%, #00c6ff 100%);
+          border: none;
+          box-shadow: 0 10px 20px rgba(13, 110, 253, 0.2);
+        }
+
+        .btn-hero.btn-primary:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 15px 30px rgba(13, 110, 253, 0.3);
+        }
+
+        .btn-hero.btn-outline-primary {
+          border: 2px solid #0d6efd;
+          background: transparent;
+        }
+
+        .btn-hero.btn-outline-primary:hover {
+          background: linear-gradient(135deg, #0d6efd 0%, #00c6ff 100%);
+          border-color: transparent;
+          color: white;
+          transform: translateY(-2px);
         }
 
         .testimonial-card {
           background: white;
-          border-radius: 15px;
-          padding: 2rem;
+          border-radius: 20px;
+          padding: 2.5rem;
           margin: 1rem;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+          transition: all 0.3s ease;
+          border: 2px solid #e2e8f0;
+        }
+
+        .testimonial-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+          border-color: #0d6efd;
         }
 
         .testimonial-avatar {
-          width: 60px;
-          height: 60px;
-          border-radius: 50%;
+          width: 80px;
+          height: 80px;
+          border-radius: 20px;
           object-fit: cover;
+          border: 4px solid #e2e8f0;
+          transition: all 0.3s ease;
+        }
+
+        .testimonial-card:hover .testimonial-avatar {
+          border-color: #0d6efd;
+        }
+
+        .section-title {
+          font-size: 2.5rem;
+          font-weight: 800;
+          text-align: center;
+          margin-bottom: 3rem;
+          background: linear-gradient(45deg, #0d6efd, #00c6ff);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        @media (max-width: 768px) {
+          .hero-section {
+            padding: 4rem 0;
+            text-align: center;
+          }
+
+          .hero-title {
+            font-size: 2.5rem;
+          }
+
+          .stat-number {
+            font-size: 2rem;
+          }
+
+          .section-title {
+            font-size: 2rem;
+          }
         }
       </style>
 
@@ -91,15 +307,23 @@
           <div class="row align-items-center">
             <div class="col-lg-6">
               <h1 class="hero-title">Discover Amazing Auctions</h1>
-              <p class="lead mb-4 text-dark">Join our thriving marketplace where unique items find their perfect match. Start your journey of buying and selling through exciting auctions!</p>
-              <div class="d-grid gap-2 d-sm-flex">
-                <a sec:authorize="!isAuthenticated()" href="/register" class="btn btn-primary btn-lg px-4 gap-3"> <i class="bi bi-person-plus me-2"></i>Get Started </a>
-                <a sec:authorize="!isAuthenticated()" href="/login" class="btn btn-outline-primary btn-lg px-4"> <i class="bi bi-box-arrow-in-right me-2"></i>Sign In </a>
-                <a sec:authorize="isAuthenticated()" href="/dashboard" class="btn btn-primary btn-lg px-4"> <i class="bi bi-speedometer2 me-2"></i>Go to Dashboard </a>
+              <p class="hero-subtitle">Join our thriving marketplace where unique items find their perfect match. Experience the thrill of bidding and selling in a secure, modern platform.</p>
+              <div class="d-grid gap-3 d-sm-flex">
+                <a sec:authorize="!isAuthenticated()" href="/register" class="btn btn-hero btn-primary"> 
+                  <i class="bi bi-person-plus me-2"></i>Get Started 
+                </a>
+                <a sec:authorize="!isAuthenticated()" href="/login" class="btn btn-hero btn-outline-primary"> 
+                  <i class="bi bi-box-arrow-in-right me-2"></i>Sign In 
+                </a>
+                <a sec:authorize="isAuthenticated()" href="/dashboard" class="btn btn-hero btn-primary"> 
+                  <i class="bi bi-speedometer2 me-2"></i>Go to Dashboard 
+                </a>
               </div>
             </div>
             <div class="col-lg-6 d-none d-lg-block">
-              <img src="https://img.freepik.com/free-vector/online-auction-isometric-landing-page_107791-3799.jpg" class="img-fluid" alt="Auction Illustration" />
+              <div class="hero-image-container">
+                <img th:src="@{/images/auction.png}" class="img-fluid" alt="Auction Illustration" />
+              </div>
             </div>
           </div>
         </div>
@@ -108,6 +332,7 @@
       <!-- Stats Section -->
       <div class="stats-section">
         <div class="container">
+          <h2 class="section-title">Our Growing Community</h2>
           <div class="row g-4">
             <div class="col-md-3">
               <div class="stat-card">
@@ -139,33 +364,33 @@
 
       <!-- Features Section -->
       <div class="container py-5">
-        <h2 class="text-center mb-5 fw-bold">Why Choose Our Platform?</h2>
+        <h2 class="section-title">Why Choose Our Platform?</h2>
         <div class="row g-4">
           <div class="col-md-4">
             <div class="feature-card h-100">
-              <div class="icon-square d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 mb-3">
+              <div class="icon-square">
                 <i class="bi bi-search"></i>
               </div>
               <h3 class="fs-2 fw-bold mb-3">Smart Search</h3>
-              <p class="text-muted">Find exactly what you're looking for with our advanced search and filtering system. Browse through categories or search specific items.</p>
+              <p class="text-muted">Find exactly what you're looking for with our advanced search and filtering system. Browse through categories or search specific items with ease.</p>
             </div>
           </div>
           <div class="col-md-4">
             <div class="feature-card h-100">
-              <div class="icon-square d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 mb-3">
+              <div class="icon-square">
                 <i class="bi bi-cash"></i>
               </div>
               <h3 class="fs-2 fw-bold mb-3">Real-time Bidding</h3>
-              <p class="text-muted">Experience the thrill of live auctions with our real-time bidding system. Get instant notifications and never miss a bid.</p>
+              <p class="text-muted">Experience the thrill of live auctions with our real-time bidding system. Get instant notifications and never miss a bid on your favorite items.</p>
             </div>
           </div>
           <div class="col-md-4">
             <div class="feature-card h-100">
-              <div class="icon-square d-inline-flex align-items-center justify-content-center fs-4 flex-shrink-0 mb-3">
+              <div class="icon-square">
                 <i class="bi bi-shield-check"></i>
               </div>
               <h3 class="fs-2 fw-bold mb-3">Secure Trading</h3>
-              <p class="text-muted">Trade with confidence using our secure payment system and buyer protection program. Your security is our top priority.</p>
+              <p class="text-muted">Trade with confidence using our secure payment system and buyer protection program. Your security and satisfaction are our top priorities.</p>
             </div>
           </div>
         </div>
@@ -174,50 +399,52 @@
       <!-- CTA Section -->
       <div class="cta-section">
         <div class="container text-center">
-          <h2 class="display-5 fw-bold mb-4">Ready to Start Trading?</h2>
-          <p class="lead mb-4">Join thousands of satisfied users who buy and sell on our platform every day.</p>
-          <a sec:authorize="!isAuthenticated()" href="/register" class="btn btn-light btn-lg px-5"> <i class="bi bi-person-plus me-2"></i>Create Account </a>
+          <h2 class="display-4 fw-bold mb-4">Ready to Start Trading?</h2>
+          <p class="lead mb-5">Join thousands of satisfied users who buy and sell on our platform every day.</p>
+          <a sec:authorize="!isAuthenticated()" href="/register" class="btn btn-hero btn-light btn-lg px-5"> 
+            <i class="bi bi-person-plus me-2"></i>Create Account 
+          </a>
         </div>
       </div>
 
       <!-- Testimonials Section -->
       <div class="container py-5">
-        <h2 class="text-center mb-5 fw-bold">What Our Users Say</h2>
+        <h2 class="section-title">What Our Users Say</h2>
         <div class="row">
           <div class="col-md-4">
             <div class="testimonial-card">
-              <div class="d-flex align-items-center mb-3">
+              <div class="d-flex align-items-center mb-4">
                 <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User" class="testimonial-avatar me-3" />
                 <div>
-                  <h5 class="mb-0">John Doe</h5>
-                  <small class="text-muted">Buyer</small>
+                  <h5 class="mb-1 fw-bold">John Doe</h5>
+                  <small class="text-primary fw-medium">Buyer</small>
                 </div>
               </div>
-              <p class="text-muted">"Found exactly what I was looking for at a great price. The bidding process was exciting and transparent!"</p>
+              <p class="text-muted mb-0">"Found exactly what I was looking for at a great price. The bidding process was exciting and transparent. The platform's user interface made it easy to track my bids!"</p>
             </div>
           </div>
           <div class="col-md-4">
             <div class="testimonial-card">
-              <div class="d-flex align-items-center mb-3">
+              <div class="d-flex align-items-center mb-4">
                 <img src="https://randomuser.me/api/portraits/women/1.jpg" alt="User" class="testimonial-avatar me-3" />
                 <div>
-                  <h5 class="mb-0">Jane Smith</h5>
-                  <small class="text-muted">Seller</small>
+                  <h5 class="mb-1 fw-bold">Jane Smith</h5>
+                  <small class="text-primary fw-medium">Seller</small>
                 </div>
               </div>
-              <p class="text-muted">"As a seller, I love how easy it is to list items and reach potential buyers. Great platform!"</p>
+              <p class="text-muted mb-0">"As a seller, I love how easy it is to list items and reach potential buyers. The platform's tools and analytics help me make better selling decisions!"</p>
             </div>
           </div>
           <div class="col-md-4">
             <div class="testimonial-card">
-              <div class="d-flex align-items-center mb-3">
+              <div class="d-flex align-items-center mb-4">
                 <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="User" class="testimonial-avatar me-3" />
                 <div>
-                  <h5 class="mb-0">Mike Johnson</h5>
-                  <small class="text-muted">Collector</small>
+                  <h5 class="mb-1 fw-bold">Mike Johnson</h5>
+                  <small class="text-primary fw-medium">Collector</small>
                 </div>
               </div>
-              <p class="text-muted">"The variety of items available is amazing. I've found rare collectibles that I couldn't find anywhere else."</p>
+              <p class="text-muted mb-0">"The variety of items available is amazing. I've found rare collectibles that I couldn't find anywhere else. The authentication process gives me peace of mind!"</p>
             </div>
           </div>
         </div>

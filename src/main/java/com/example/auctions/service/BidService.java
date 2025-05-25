@@ -126,4 +126,16 @@ public class BidService {
             return timestamp;
         }
     }
+
+    public long countActiveAuctionsParticipating(User user) {
+        return bidRepository.countDistinctAuctionsByBidderAndAuctionEndTimeAfter(user, java.time.LocalDateTime.now());
+    }
+    
+    public long countAuctionsAsHighestBidder(User user) {
+        return bidRepository.countAuctionsWhereUserIsHighestBidder(user);
+    }
+    
+    public long countTotalAuctionsWon(User user) {
+        return bidRepository.countAuctionsWonByUser(user);
+    }
 }

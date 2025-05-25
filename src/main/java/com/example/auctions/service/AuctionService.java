@@ -259,6 +259,19 @@ public class AuctionService {
         return auctionRepository.findByWinner(winner);
     }
 
+    // Seller Statistics Methods
+    public long countActiveAuctionsBySeller(User seller) {
+        return auctionRepository.countBySellerAndStatus(seller, AuctionStatus.ACTIVE);
+    }
+
+    public long countSuccessfulAuctionsBySeller(User seller) {
+        return auctionRepository.countBySellerAndStatus(seller, AuctionStatus.ENDED);
+    }
+
+    public long countWatchedAuctions(User user) {
+        return auctionRepository.countWatchedAuctionsByUser(user);
+    }
+
     // Inner class for WebSocket messages
     private static class AuctionEndMessage {
         private final Long auctionId;

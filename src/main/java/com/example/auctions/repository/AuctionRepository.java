@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -33,4 +34,37 @@ public interface AuctionRepository extends JpaRepository<Auction, Long> {
     List<Auction> findBySellerAndStatusOrderByEndTimeDesc(User seller, AuctionStatus status);
 
     List<Auction> findByWinner(User winner);
+
+    long countBySellerAndStatus(User seller, AuctionStatus status);
+    
+    long countBySellerAndStatusAndWinnerIsNotNull(User seller, AuctionStatus status);
+
+    @Query("SELECT COUNT(DISTINCT a) FROM Auction a JOIN a.bids b WHERE b.bidder = :user")
+    long countWatchedAuctionsByUser(@Param("user") User user);
+
+    @Query("SELECT COUNT(a) FROM Auction a " +
+           "WHERE a.seller = :seller " +
+           "AND a.status = 'ENDED' " +
+           "AND a.winner IS NOT NULL " +
+           "AND a.endTime BETWEEN :startDate AND :endDate")
+    long countSuccessfulAuctionsInPeriod(
+        @Param("seller") User seller,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT COUNT(a) FROM Auction a " +
+           "WHERE a.seller = :seller " +
+           "AND a.createdAt BETWEEN :startDate AND :endDate")
+    long countAuctionsCreatedInPeriod(
+        @Param("seller") User seller,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate);
+
+    @Query("SELECT COALESCE(AVG(SIZE(a.bids)), 0) FROM Auction a " +
+           "WHERE a.seller = :seller " +
+           "AND a.createdAt BETWEEN :startDate AND :endDate")
+    double calculateAverageBiddersInPeriod(
+        @Param("seller") User seller,
+        @Param("startDate") LocalDateTime startDate,
+        @Param("endDate") LocalDateTime endDate);
 } 
